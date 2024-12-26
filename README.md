@@ -1,6 +1,6 @@
-# CppND-System-Monitor
+# Linux-System-Monitor
 
-System Monitor is a tool which was developed as part of the Object Oriented Programming Course of the [Udacity C++ Nanodegree Program](https://www.udacity.com/course/c-plus-plus-nanodegree--nd213).
+Custom System Monitor, similar to htop.
 
 ![System Monitor](images/monitor.png)
 

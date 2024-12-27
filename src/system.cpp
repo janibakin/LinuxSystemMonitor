@@ -24,7 +24,7 @@ vector<Process>& System::Processes() {
   processes_.clear();
   
   // add Processes to processes_
-  for(uint64_t i = 0; i < pids.size(); ++i) {
+  for(size_t i = 0; i < pids.size(); ++i) {
     int curr_pid = pids[i];
     processes_.emplace_back(Process(curr_pid));
   }

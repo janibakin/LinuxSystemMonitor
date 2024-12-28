@@ -30,25 +30,31 @@ std::string NCursesDisplay::ProgressBar(float percent) {
 
 void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   int row{0};
-  mvwprintw(window, ++row, 2, ("OS: " + system.OperatingSystem()).c_str());
-  mvwprintw(window, ++row, 2, ("Kernel: " + system.Kernel()).c_str());
+  std::string os_info = "OS: " + system.OperatingSystem();
+  mvwprintw(window, ++row, 2, "%s", os_info.c_str());
+
+  std::string kernel_info = "Kernel: " + system.Kernel();
+  mvwprintw(window, ++row, 2, "%s", kernel_info.c_str());
+
   mvwprintw(window, ++row, 2, "CPU: ");
   wattron(window, COLOR_PAIR(1));
-  mvwprintw(window, row, 10, "");
-  wprintw(window, ProgressBar(system.Cpu().Utilization()).c_str());
+  wmove(window, row, 10);
+  wclrtoeol(window);
+  std::string cpu_progress = ProgressBar(system.Cpu().Utilization());
+  wprintw(window, "%s", cpu_progress.c_str());
   wattroff(window, COLOR_PAIR(1));
   mvwprintw(window, ++row, 2, "Memory: ");
   wattron(window, COLOR_PAIR(1));
-  mvwprintw(window, row, 10, "");
-  wprintw(window, ProgressBar(system.MemoryUtilization()).c_str());
-  wattroff(window, COLOR_PAIR(1));
-  mvwprintw(window, ++row, 2,
-            ("Total Processes: " + to_string(system.TotalProcesses())).c_str());
-  mvwprintw(
-      window, ++row, 2,
-      ("Running Processes: " + to_string(system.RunningProcesses())).c_str());
-  mvwprintw(window, ++row, 2,
-            ("Up Time: " + Format::ElapsedTime(system.UpTime())).c_str());
+  wmove(window, row, 10);
+  wclrtoeol(window);
+  std::string memory_progress = ProgressBar(system.MemoryUtilization());
+  wprintw(window, "%s", memory_progress.c_str());  wattroff(window, COLOR_PAIR(1));
+  std::string total_procs = "Total Processes: " + std::to_string(system.TotalProcesses());
+  mvwprintw(window, ++row, 2, "%s", total_procs.c_str());
+  std::string running_procs = "Running Processes: " + std::to_string(system.RunningProcesses());
+  mvwprintw(window, ++row, 2, "%s", running_procs.c_str());
+  std::string uptime = "Up Time: " + Format::ElapsedTime(system.UpTime());
+  mvwprintw(window, ++row, 2, "%s", uptime.c_str());
   wrefresh(window);
 }
 
@@ -62,7 +68,7 @@ void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
   int const time_column{35};
   int const command_column{46};
 
-  int rows, cols;
+  [[maybe_unused]] int rows, cols;
   getmaxyx(window, rows, cols);  // Get window dimensions
 
   wattron(window, COLOR_PAIR(2));
@@ -75,17 +81,16 @@ void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
   wattroff(window, COLOR_PAIR(2));
   for (int i = 0; i < n; ++i) {
     // Clear the line
-    mvwprintw(window, ++row, pid_column, string(cols - 2, ' ').c_str());
+    std::string empty_space(cols - 2, ' ');
+    mvwprintw(window, ++row, pid_column, "%s", empty_space.c_str());
 
-    mvwprintw(window, row, pid_column, to_string(processes[i].Pid()).c_str());
-    mvwprintw(window, row, user_column, processes[i].User().c_str());
+    mvwprintw(window, row, pid_column, "%d", processes[i].Pid());
+    mvwprintw(window, row, user_column, "%s", processes[i].User().c_str());
     float cpu = processes[i].CpuUtilization() * 100;
-    mvwprintw(window, row, cpu_column, to_string(cpu).substr(0, 4).c_str());
-    mvwprintw(window, row, ram_column, processes[i].Ram().c_str());
-    mvwprintw(window, row, time_column,
-              Format::ElapsedTime(processes[i].UpTime()).c_str());
-    mvwprintw(window, row, command_column,
-              processes[i].Command().substr(0, cols - command_column).c_str());
+    mvwprintw(window, row, cpu_column, "%s", to_string(cpu).substr(0, 4).c_str());
+    mvwprintw(window, row, ram_column, "%s", processes[i].Ram().c_str());
+    mvwprintw(window, row, time_column, "%s", Format::ElapsedTime(processes[i].UpTime()).c_str());
+    mvwprintw(window, row, command_column, "%s", processes[i].Command().substr(0, cols - command_column).c_str());
   }
 }
 
